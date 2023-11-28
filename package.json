@@ -1,0 +1,29 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "��a\u0000p\u0000i\u0000 \u0000f\u0000o\u0000r\u0000 \u0000t\u0000h\u0000e\u0000 \u0000v\u0000e\u0000h\u0000i\u0000c\u0000l\u0000e\u0000 \u0000f\u0000l\u0000e\u0000e\u0000t\u0000 \u0000a\u0000p\u0000p\u0000l\u0000i\u0000c\u0000a\u0000t\u0000i\u0000o\u0000n\u0000\r\u0000 \u0000t\u0000y\u0000p\u0000e\u0000s\u0000c\u0000r\u0000i\u0000p\u0000t\u0000\r\u0000 \u0000a\u0000w\u0000s\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sameeranamarnath/vehiclefleettracker2023-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sameeranamarnath/vehiclefleettracker2023-api/issues"
+  },
+  "homepage": "https://github.com/sameeranamarnath/vehiclefleettracker2023-api#readme",
+  "dependencies": {
+    "@aws-sdk/util-dynamodb": "^3.458.0",
+    "aws-sdk": "^2.1505.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.129",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.2"
+  }
+}
