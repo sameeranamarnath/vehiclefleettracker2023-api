@@ -1,5 +1,5 @@
 # Connect
-FROM amazon/aws-lambda-nodejs:12 AS addConnectionHandler
+FROM amazon/aws-lambda-nodejs:12 AS connect
 
 ARG FUNCTION_DIR="/var/task"
 
@@ -13,10 +13,10 @@ RUN tsc
 
 RUN mkdir -p ${FUNCTION_DIR}
 
-CMD ["build/addConnection.handler"]
+CMD ["build/connect.handler"]
 
 # Disconnect
-FROM amazon/aws-lambda-nodejs:12 AS removeConnectionHandler
+FROM amazon/aws-lambda-nodejs:12 AS disconnect
 
 ARG FUNCTION_DIR="/var/task"
 
@@ -30,10 +30,10 @@ RUN tsc
 
 RUN mkdir -p ${FUNCTION_DIR}
 
-CMD ["build/removeConnection.handler"]
+CMD ["build/disconnect.handler"]
 
 # Send Vendor
-FROM amazon/aws-lambda-nodejs:12 AS broadcastToVendorsHandler
+FROM amazon/aws-lambda-nodejs:12 AS sendvendor
 
 ARG FUNCTION_DIR="/var/task"
 
@@ -50,7 +50,7 @@ RUN mkdir -p ${FUNCTION_DIR}
 CMD ["build/broadcastToVendors.handler"]
 
 # Get Vendors
-FROM amazon/aws-lambda-nodejs:12 AS getVendorsHandler
+FROM amazon/aws-lambda-nodejs:12 AS getvendors
 
 ARG FUNCTION_DIR="/var/task"
 
