@@ -1,59 +1,66 @@
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
-import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import { AWSError, DynamoDB } from "aws-sdk";
-import { PromiseResult } from "aws-sdk/lib/request";
-import { dynamodbScanTable } from "./aws";
+import { APIGatewayProxyResult, SQSEvent } from "aws-lambda";
+import AWS from "aws-sdk";
+import { broadcastMessageWebsocket, getAllScanResults, sqsDeleteMessage } from "./aws";
 
-export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
-    const tableName = process.env.AWS_VENDOR_TABLE_NAME ?? 'vendors';
-    const pageLimit = event.queryStringParameters?.limit;
-    const lastEvaluatedKey = event.queryStringParameters?.lastEvaluatedKey ? marshall(JSON.parse(event.queryStringParameters?.lastEvaluatedKey)) : undefined;
+export const handler = async (event: SQSEvent): Promise<APIGatewayProxyResult> => {
+    const tableName = process.env.AWS_TABLE_NAME ?? 'websocket-connections';
+    //guaranteed to be defined
+    const sqsUrl = process.env.AWS_SQS_URL ?? "" ;
+    const websocketUrl = process.env.AWS_WEBSOCKET_URL ?? '';
+    
+    const endpoint = new URL(websocketUrl);
+    const apigwManagementApi = new AWS.ApiGatewayManagementApi({
+        apiVersion: '2018-11-29',
+        endpoint: endpoint.hostname + endpoint.pathname
+    })
 
-    let scanTableGen: AsyncGenerator<PromiseResult<DynamoDB.ScanOutput, AWSError>, void, unknown>;
-    try {
-        scanTableGen = await dynamodbScanTable(tableName, Number(pageLimit), lastEvaluatedKey);
-    } catch(e) {
+    const message = event.Records[0].body;
+
+    if (!message) {
         return {
             statusCode: 500,
             headers: {
-                "content-type": "text/plain; charset=utf-8",
-                "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                "content-type": "text/plain; charset=utf-8"
             },
-            body: e instanceof Error ? e.message : 'dynamoDbScanTable returned an unknown error'
+            body: 'event message empty or null'
         }
     }
-    
-    const iterator = await scanTableGen?.next();
 
-    if (iterator.value) {
+    const dbRes = await getAllScanResults<{ connectionId: string }>(tableName);
+    if (dbRes instanceof Error) {
         return {
-            statusCode: 200,
+            statusCode: 500,
             headers: {
-                "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                "content-type": "text/plain; charset=utf-8"
             },
-            body: JSON.stringify({
-                Items: iterator.value.Items,
-                count: iterator.value.Count,
-                lastEvaluatedKey: iterator.value.LastEvaluatedKey ? unmarshall(iterator.value.LastEvaluatedKey) : null
-            })
+            body: dbRes.message
         }
     }
+
+    const broadcastRes = await broadcastMessageWebsocket({
+        apiGateway: apigwManagementApi,
+        connections: dbRes,
+        message,
+        tableName
+    })
+    if (broadcastRes instanceof Error) {
+        return {
+            statusCode: 500,
+            headers: {
+                "content-type": "text/plain; charset=utf-8"
+            },
+            body: broadcastRes.message
+        }
+    }
+
+    console.log(`sent message ${message} to ${dbRes.length} users!`)
+
+    await sqsDeleteMessage(sqsUrl, event.Records[0].receiptHandle);
 
     return {
         statusCode: 200,
-        headers: {
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-        },
         body: JSON.stringify({
-            Items: [],
-            count: 0,
-            lastEvaluatedKey: null
+            message: `sent message ${message} to ${dbRes.length} users!`,
         })
     }
 }
