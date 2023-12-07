@@ -52,7 +52,7 @@ resource "aws_lambda_function" "sendvendor" {
   environment {
     variables = {
       AWS_TABLE_NAME    = "${var.websocket_table_name}"
-      AWS_SQS_URL       = "https://sqs.us-east-1.amazonaws.com/567192499845/vendor-twitter-queue"
+      AWS_SQS_URL       = "${var.sqs_queue_url}"
       AWS_WEBSOCKET_URL = "${aws_apigatewayv2_api.websocket_gw.api_endpoint}/${var.api_gateway_stage_name}"
     }
   }
