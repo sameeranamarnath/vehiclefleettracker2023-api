@@ -110,6 +110,7 @@ jobs:
         run: terraform fmt -check
         continue-on-error: true
 
+        #init
       - name: Terraform Init
         id: init
         working-directory: ./terraform
