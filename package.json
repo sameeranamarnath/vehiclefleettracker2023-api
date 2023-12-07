@@ -19,7 +19,8 @@
   "dependencies": {
     "@aws-sdk/util-dynamodb": "^3.458.0",
     "aws-sdk": "^2.1505.0",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "wscat": "^5.2.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.129",
