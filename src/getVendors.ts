@@ -3,6 +3,7 @@ import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import { AWSError, DynamoDB } from "aws-sdk";
 import { PromiseResult } from "aws-sdk/lib/request";
 import { dynamodbScanTable } from "./aws";
+import AWS from 'aws-sdk';
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
     const tableName = process.env.AWS_VENDOR_TABLE_NAME ?? 'vendors';
@@ -39,7 +40,7 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
             body: JSON.stringify({
                 Items: iterator.value.Items,
                 count: iterator.value.Count,
-                lastEvaluatedKey: iterator.value.LastEvaluatedKey ? unmarshall(iterator.value.LastEvaluatedKey) : null
+                lastEvaluatedKey: iterator.value.LastEvaluatedKey ? AWS.DynamoDB.Converter.unmarshall(iterator.value.LastEvaluatedKey) : null
             })
         }
     }
