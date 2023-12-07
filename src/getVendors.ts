@@ -6,6 +6,7 @@ import { dynamodbScanTable } from "./aws";
 
 export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
     const tableName = process.env.AWS_VENDOR_TABLE_NAME ?? 'vendors';
+    //table name
     const pageLimit = event.queryStringParameters?.limit;
     const lastEvaluatedKey = event.queryStringParameters?.lastEvaluatedKey ? marshall(JSON.parse(event.queryStringParameters?.lastEvaluatedKey)) : undefined;
 
