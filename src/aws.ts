@@ -1,5 +1,6 @@
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import AWS from 'aws-sdk';
+import { AttributeValue } from 'aws-sdk/clients/directoryservice';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -45,7 +46,7 @@ export const dynamodbScanTable = async function* (tableName: string, limit: numb
             }
 
             lastEvaluatedKey = (result as AWS.DynamoDB.ScanOutput).LastEvaluatedKey;
-            result.Items = result.Items?.map((item) => unmarshall(item));
+            result.Items = result.Items?.map((item) => AWS.DynamoDB.Converter.unmarshall(item ));
             yield result;
         } catch(e) {
             if (e instanceof Error) {
