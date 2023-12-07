@@ -18,6 +18,9 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
       - name: Configure AWS credentials from AWS account
         uses: aws-actions/configure-aws-credentials@v1
@@ -38,6 +41,7 @@ jobs:
 
       - name: Build, tag, and push connect image to Amazon ECR
         id: build-image-connect
+        uses: npm install
         env:
           AWS_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           AWS_IMAGE_TAG: ${{ github.sha }}
