@@ -91,8 +91,6 @@ export const getAllScanResults = async <T>(tableName: string, limit: number = 25
     }
 }
 
-
-//for adding twitter stream
 export const dynamoDbAddConnection = async (tableName: string, connectionId: string) => {
     try {
         const params: AWS.DynamoDB.PutItemInput = {
@@ -111,7 +109,6 @@ export const dynamoDbAddConnection = async (tableName: string, connectionId: str
     }
 }
 
-//for removing twitter stream
 export const dynamoDbRemoveConnection = async (tableName: string, connectionId: string) => {
     try {
         const params: AWS.DynamoDB.DeleteItemInput = {
